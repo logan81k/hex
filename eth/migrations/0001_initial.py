@@ -71,7 +71,7 @@ class Migration(migrations.Migration):
                 ('transaction_index', models.CharField(max_length=4)),
                 ('v', models.CharField(max_length=8)),
                 ('value', models.CharField(max_length=32)),
-                ('block_id', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='eth.Blocks')),
+                ('block_id', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='ex.eth.Blocks')),
             ],
         ),
     ]

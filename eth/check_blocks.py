@@ -2,7 +2,7 @@ import os
 import sys
 
 from eth.clients.eth_client import EthClient
-from eth.clients.eth_requester import EthRequester
+from eth.clients import EthRequester
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "hex.settings")
 import django

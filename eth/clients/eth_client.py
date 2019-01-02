@@ -1,5 +1,5 @@
-from eth.clients.eth_requester import EthRequester, RpcException
-from eth.clients.response.block_number import BlockNumber
+from eth.clients import EthRequester, RpcException
+from eth.clients import BlockNumber
 
 
 class EthClient:
