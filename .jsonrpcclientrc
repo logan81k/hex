@@ -1,0 +1,6 @@
+[general]
+basic_logging = no
+id_generator = jsonrpcclient.id_generators.decimal
+trim_log_values = no
+validate_against_schema = yes
+
