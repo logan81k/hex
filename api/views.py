@@ -9,12 +9,12 @@ from api import serializers
 
 
 class IndexView(GenericAPIView):
+    serializer_class = serializers.IndexSerializer
 
     def get(self, request):
-        return HttpResponse("Hello, HEX api")
+        return Response(status=status.HTTP_200_OK, data={'message': 'Hello, HEX api'})
 
     def post(self, request, *args, **kwargs):
-        self.serializer_class = serializers.IndexSerializer
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
@@ -22,7 +22,6 @@ class IndexView(GenericAPIView):
         return Response(status=status.HTTP_200_OK, data={'name': name})
 
     def put(self, request, *args, **kwargs):
-        self.serializer_class = serializers.IndexSerializer
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
