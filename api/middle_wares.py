@@ -22,7 +22,6 @@ class LoggingMiddleware(MiddlewareMixin):
 
     def process_response(self, request, response):
         elapsed_time = time.time() - request.start_time
-        uuid = request.uuid
         logger.debug(
             f"[{request.uuid}] response: {request.method} {request.get_full_path()}{request.GET.urlencode()} ({elapsed_time} s)")
         return response

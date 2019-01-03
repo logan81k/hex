@@ -154,7 +154,7 @@ REST_FRAMEWORK = {
     #     'rest_framework.parsers.FormParser',
     #     'rest_framework.parsers.MultiPartParser',
     # ),
-    # 'EXCEPTION_HANDLER': 'handlers.exception_handler.api_exception_handler',
+    'EXCEPTION_HANDLER': 'api.handlers.exception_handler.api_exception_handler',
 }
 
 SWAGGER_SETTINGS = {
@@ -192,7 +192,7 @@ LOGGING = {
     },
     'root': {
         'handlers': ['console'],
-        'level': 'INFO',
+        'level': 'DEBUG',
     },
     'loggers': {
         'api': {
@@ -200,7 +200,7 @@ LOGGING = {
             'level': 'DEBUG',
             'propagate': False,
         },
-        'requests': {
+        'swagger_spec_validator': {
             'handlers': ['console'],
             'level': 'ERROR',
             'propagate': False,
