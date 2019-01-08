@@ -1,32 +1,38 @@
 import os
 import sys
 
-from eth.clients.eth_client import EthClient
-from eth.clients import EthRequester
-
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "hex.settings")
 import django
 
 django.setup()
+
+import logging
+from eth.clients.eth_client import EthClient
+from eth.clients.eth_requester import EthRequester
+
+from eth.models import LastBlock, Blocks
+
+logger = logging.getLogger(__name__)
 
 
 def main(argv):
     requester = EthRequester("10.0.1.163", 8898)
     client = EthClient(requester)
     block_number = client.get_block_number()
-    print(block_number.hex_number)
-    print(block_number.number)
+    block_response = client.get_block_by_number(block_number.number)
+    try:
+        last_block = LastBlock.objects.get(id=1)
+    except LastBlock.DoesNotExist:
+        last_block = LastBlock.objects.create(number=block_response.number, hash=block_response.hash)
 
-    block = client.get_block_by_number(block_number.number)
-    print(block)
-    # try:
-    #     main = Main.objects.get(id=1)
-    # except Main.DoesNotExist as e:
-    #     main = Main.objects.create(number=block_number, hash=block_hash)
-    #
-    # if main.number < block_number:
-    #     next_number = main.number + 1
-    #     rpc_body = {"jsonrpc": "2.0", "method": "eth_getBlockByNumber", "params": [hex(next_number), True], "id": 100}
+    if last_block.number < block_response.get_number():
+        next_number = last_block.number + 1
+        block_response = client.get_block_by_number(hex(next_number))
+        try:
+            next_block = Blocks.objects.get(number=block_response.get_number())
+        except Blocks.DoesNotExist:
+            next_block = Blocks.create_with_block(block_response)
+        print(next_block)
 
 
 if __name__ == '__main__':

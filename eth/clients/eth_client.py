@@ -1,5 +1,6 @@
-from eth.clients import EthRequester, RpcException
-from eth.clients import BlockNumber
+from eth.clients.eth_requester import EthRequester
+from eth.clients.responses import BlockNumber, Block
+from eth.custom_exceptions import RpcException
 
 
 class EthClient:
@@ -13,12 +14,13 @@ class EthClient:
         response = self.requester.execute("eth_blockNumber")
         return BlockNumber(response)
 
-    def get_block_by_number(self, number):
-        response = self.requester.execute("eth_getBlockByNumber", hex(number), True)
+    def get_block_by_number(self, block_number: str):
+        response = self.requester.execute("eth_getBlockByNumber", block_number, True)
         if response is None:
             raise RpcException()
-        transactions = response["transactions"]
-        return transactions
+        return Block(response)
+
+
 
 
 

@@ -17,12 +17,13 @@ class IndexView(GenericAPIView):
     serializer_class = serializers.IndexSerializer
 
     def get(self, request):
-        print('yyyyyyyyyyyyyy')
         return Response(status=status.HTTP_200_OK, data={'message': 'Hello, HEX api'})
 
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
+
+        print(serializer.validated_data)
 
         name = serializer.validated_data['name']
         return Response(status=status.HTTP_200_OK, data={'name': name})
@@ -35,8 +36,21 @@ class IndexView(GenericAPIView):
         return Response(status=status.HTTP_200_OK, data={'name': name})
 
 
-class ExceptionView(APIView):
+class ExceptionView(GenericAPIView):
+    serializer_class =  serializers.ExceptionSerializer
+
+    class Response:
+        pass
 
     def get(self, request, *args, **kwargs):
         raise OnlyAvailableException
         # return Response(status=status.HTTP_200_OK, data="raise exceptions")
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        print(serializer.validated_data)
+        name = serializer.validated_data['name']
+        error = serializer.validated_data['error']
+        return Response(status=status.HTTP_200_OK, data={'name': name})

@@ -1,8 +1,10 @@
+from decimal import Decimal
+
 from django.db import models
 
 
 # Create your models here.
-class Main(models.Model):
+class LastBlock(models.Model):
     number = models.IntegerField(null=False)
     hash = models.CharField(max_length=255, null=False)
     updated_time = models.DateTimeField(auto_now=True)
@@ -13,10 +15,10 @@ class Blocks(models.Model):
     number = models.IntegerField(null=False)
     hash = models.CharField(max_length=255, null=False)
     parent_hash = models.CharField(max_length=255, null=False)
-    nonce = models.IntegerField(null=False)
+    nonce = models.CharField(max_length=255, null=False)
     size = models.IntegerField(null=False)
-    difficulty = models.CharField(max_length=255, null=False)
-    total_difficulty = models.CharField(max_length=255, null=False)
+    difficulty = models.DecimalField(max_digits=36, decimal_places=18, null=False)
+    total_difficulty = models.DecimalField(max_digits=36, decimal_places=18, null=False)
     gas_limit = models.DecimalField(max_digits=36, decimal_places=18, null=False)
     gas_used = models.DecimalField(max_digits=36, decimal_places=18, null=False)
     author = models.CharField(max_length=255, null=False)
@@ -31,6 +33,17 @@ class Blocks(models.Model):
     timestamp = models.DateTimeField()
     updated_time = models.DateTimeField(auto_now=True)
     created_time = models.DateTimeField(auto_now_add=True, editable=False)
+
+    @classmethod
+    def create_with_block(cls, block):
+        return cls.objects.create(number=block.get_number(), hash=block.hash, parent_hash=block.parent_hash,
+                                  nonce=int(block.nonce, 16), size=int(block.size, 16), difficulty=block.difficulty,
+                                  total_difficulty=block.total_difficulty, gas_limit=Decimal(block.gas_limit),
+                                  gas_used=Decimal(block.gas_used), author=block.author, miner=block.miner,
+                                  extra_data=block.extra_data, logs_bloom=block.logs_bloom,
+                                  mix_hash=block.mix_hash, receipts_root=block.receipts_root,
+                                  seal_fields=block.seal_fields, sha3_uncles=block.sha3_uncles,
+                                  state_root=block.state_root, timestamp=block.timestamp)
 
 
 class Transactions(models.Model):

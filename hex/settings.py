@@ -43,6 +43,7 @@ INSTALLED_APPS = [
 
     'eth.apps.EthConfig',
     'api.apps.ApiConfig',
+    'cs.apps.CsConfig',
 ]
 
 MIDDLEWARE = [
@@ -192,7 +193,7 @@ LOGGING = {
     },
     'root': {
         'handlers': ['console'],
-        'level': 'DEBUG',
+        'level': 'INFO',
     },
     'loggers': {
         'api': {
