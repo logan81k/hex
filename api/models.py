@@ -1,5 +1,3 @@
-from decimal import Decimal
-
 from django.db import models
 
 
@@ -31,38 +29,47 @@ class Blocks(models.Model):
     sha3_uncles = models.CharField(max_length=255, null=False)
     state_root = models.CharField(max_length=255, null=False)
     timestamp = models.DateTimeField(null=False)
+    transactions_root = models.CharField(max_length=255, null=False)
     updated_time = models.DateTimeField(auto_now=True)
     created_time = models.DateTimeField(auto_now_add=True, editable=False)
 
     @classmethod
-    def create_with_block(cls, block):
-        return cls.objects.create(number=block.get_number(), hash=block.hash, parent_hash=block.parent_hash,
-                                  nonce=block.nonce, size=block.get_size(), difficulty=block.get_difficulty(),
-                                  total_difficulty=block.get_total_difficulty(), gas_limit=block.get_gas_limit(),
-                                  gas_used=block.get_gas_used(), author=block.author, miner=block.miner,
-                                  extra_data=block.extra_data, logs_bloom=block.logs_bloom,
-                                  mix_hash=block.mix_hash, receipts_root=block.receipts_root,
-                                  seal_fields=block.seal_fields, sha3_uncles=block.sha3_uncles,
-                                  state_root=block.state_root, timestamp=block.get_timestamp())
+    def create_with_block(cls, b):
+        return cls.objects.create(number=b.get_number(), hash=b.hash, parent_hash=b.parent_hash, nonce=b.nonce,
+                                  size=b.get_size(), difficulty=b.get_difficulty(),
+                                  total_difficulty=b.get_total_difficulty(), gas_limit=b.get_gas_limit(),
+                                  gas_used=b.get_gas_used(), author=b.author, miner=b.miner,
+                                  extra_data=b.extra_data, logs_bloom=b.logs_bloom, mix_hash=b.mix_hash,
+                                  receipts_root=b.receipts_root, seal_fields=b.seal_fields, sha3_uncles=b.sha3_uncles,
+                                  state_root=b.state_root, timestamp=b.get_timestamp(),
+                                  transactions_root=b.transactions_root)
 
 
-# class Transactions(models.Model):
-#     block_id = models.ForeignKey(Blocks, on_delete=models.CASCADE)
-#     hash = models.CharField(max_length=255, null=False)
-#     from_address = models.CharField(max_length=255, null=False)
-#     to_address = models.CharField(max_length=255, null=False)
-#     gas = models.DecimalField(max_digits=36, decimal_places=18, null=False)
-#     gas_price = models.DecimalField(max_digits=36, decimal_places=18, null=False)
-#     chain_id = models.CharField(max_length=4, null=False)
-#     condition = models.CharField(max_length=255, null=True)
-#     creates = models.CharField(max_length=255, null=True)
-#     input = models.CharField(max_length=255, null=False)
-#     nonce = models.IntegerField(null=False)
-#     public_key = models.CharField(max_length=1024, null=False)
-#     r = models.CharField(max_length=255, null=False)
-#     raw = models.CharField(max_length=2048, null=False)
-#     s = models.CharField(max_length=4096, null=False)
-#     standard_v = models.CharField(max_length=4, null=False)
-#     transaction_index = models.CharField(max_length=4, null=False)
-#     v = models.CharField(max_length=8, null=False)
-#     value = models.CharField(max_length=32, null=False)
+class Transactions(models.Model):
+    block = models.ForeignKey(Blocks, on_delete=models.CASCADE)
+    hash = models.CharField(max_length=255, null=False, unique=True)
+    from_address = models.CharField(max_length=255, null=False)
+    to_address = models.CharField(max_length=255, null=False)
+    value = models.CharField(max_length=32, null=False)
+    nonce = models.IntegerField(null=False)
+    gas = models.IntegerField(null=False)
+    gas_price = models.DecimalField(max_digits=36, decimal_places=18, null=False)
+    input = models.TextField(max_length=255, null=False)
+    chain_id = models.CharField(max_length=4, null=True)
+    condition = models.CharField(max_length=255, null=True)
+    creates = models.CharField(max_length=255, null=True)
+    public_key = models.CharField(max_length=1024, null=False)
+    raw = models.TextField(max_length=2048, null=False)
+    transaction_index = models.CharField(max_length=4, null=False)
+    standard_v = models.CharField(max_length=4, null=False)
+    r = models.CharField(max_length=255, null=False)
+    v = models.CharField(max_length=8, null=False)
+    s = models.CharField(max_length=4096, null=False)
+
+    @classmethod
+    def create_with_transaction(cls, block, tx):
+        return cls.objects.create(block=block, hash=tx.hash, from_address=tx.from_address, to_address=tx.to_address,
+                                  value=tx.value, nonce=tx.get_nonce(), gas=tx.get_gas(), gas_price=tx.get_gas_price(),
+                                  input=tx.input, chain_id=tx.chain_id, condition=tx.condition, creates=tx.creates,
+                                  public_key=tx.public_key, raw=tx.raw, transaction_index=tx.transaction_index,
+                                  standard_v=tx.standard_v, r=tx.r, v=tx.v, s=tx.s)

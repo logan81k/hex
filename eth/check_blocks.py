@@ -1,5 +1,4 @@
 import os
-import sys
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "hex.settings")
 import django
@@ -7,46 +6,49 @@ import django
 django.setup()
 
 import logging
-from api.models import LastBlock, Blocks
-from eth.clients.eth_client import EthClient
-from eth.clients.eth_requester import EthRequester
-
+from eth.managers.manager import EthManager
+from api.models import LastBlock, Blocks, Transactions
 
 logger = logging.getLogger(__name__)
 
 
-def process_block(block):
-    pass
+class CheckBlock:
 
+    def __init__(self) -> None:
+        self.manager = EthManager()
 
-def main(argv):
-    requester = EthRequester("10.0.1.163", 8898)
-    client = EthClient(requester)
-    block_number = client.get_block_number()
-    logger.info(f"block_number: {block_number.get_number()}")
-    block = client.get_block_by_number(block_number.number)
-    try:
-        last_block = LastBlock.objects.get(id=1)
-    except LastBlock.DoesNotExist:
-        last_block = LastBlock.objects.create(number=block.get_number(), hash=block.hash)
-
-    if last_block.number < block.get_number():
-        print("gogogo")
-        next_number = last_block.number + 1
-        block = client.get_block_by_number(hex(next_number))
+    def start(self) -> None:
+        block_number = self.manager.get_block_number()
+        logger.info(f"block_number: {block_number.get_number()}")
+        rpc_block = self.manager.get_block_by_number(block_number.number)
         try:
-            next_block = Blocks.objects.get(number=block.get_number())
+            last_block = LastBlock.objects.get(id=1)
+        except LastBlock.DoesNotExist:
+            last_block = LastBlock.objects.create(number=rpc_block.get_number(), hash=rpc_block.hash)
+
+        if last_block.number < rpc_block.get_number():
+            next_number = last_block.number + 1
+            rpc_block = self.manager.get_block_by_number(hex(next_number))
+
+        block = self.insert_block(rpc_block)
+        self.insert_transactions(block, rpc_block.transactions)
+
+    def insert_block(self, rpc_block):
+        try:
+            block = Blocks.objects.get(number=rpc_block.get_number())
         except Blocks.DoesNotExist:
-            print(block.get_difficulty())
-            print(block.get_total_difficulty())
-            next_block = Blocks.create_with_block(block)
+            block = Blocks.create_with_block(rpc_block)
+        return block
 
-        process_block(next_block)
+    def insert_transactions(self, block, transactions):
+        for transaction in transactions:
+            print(f"tx hash: {transaction.hash}")
+            try:
+                tx = Transactions.objects.get(hash=transaction.hash)
+            except Transactions.DoesNotExist:
+                tx = Transactions.create_with_transaction(block, transaction)
 
 
-        last_block.number = next_number
-        last_block.save()
 
-
-if __name__ == '__main__':
-    main(sys.argv)
+check_block = CheckBlock()
+check_block.start()
