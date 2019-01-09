@@ -1,3 +1,4 @@
+
 class BlockNumber:
     def __init__(self, number) -> None:
         self.number = number
@@ -32,4 +33,24 @@ class Block:
 
     def get_number(self):
         return int(self.number, 16)
+
+    def get_gas_limit(self):
+        return int(self.gas_limit, 16)
+
+    def get_gas_used(self):
+        return int(self.gas_used, 16)
+
+    def get_size(self):
+        return int(self.size, 16)
+
+    def get_difficulty(self):
+        return int(self.difficulty, 16)
+
+    def get_total_difficulty(self):
+        return int(self.total_difficulty, 16)
+
+    def get_timestamp(self):
+        ts = int(self.timestamp, 16)
+        from django.utils.datetime_safe import datetime
+        return datetime.utcfromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
 

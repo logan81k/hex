@@ -12,12 +12,14 @@ class EthClient:
 
     def get_block_number(self):
         response = self.requester.execute("eth_blockNumber")
+        if response is None:
+            raise RpcException
         return BlockNumber(response)
 
     def get_block_by_number(self, block_number: str):
         response = self.requester.execute("eth_getBlockByNumber", block_number, True)
         if response is None:
-            raise RpcException()
+            raise RpcException
         return Block(response)
 
 

@@ -7,32 +7,45 @@ import django
 django.setup()
 
 import logging
+from api.models import LastBlock, Blocks
 from eth.clients.eth_client import EthClient
 from eth.clients.eth_requester import EthRequester
 
-from eth.models import LastBlock, Blocks
 
 logger = logging.getLogger(__name__)
+
+
+def process_block(block):
+    pass
 
 
 def main(argv):
     requester = EthRequester("10.0.1.163", 8898)
     client = EthClient(requester)
     block_number = client.get_block_number()
-    block_response = client.get_block_by_number(block_number.number)
+    logger.info(f"block_number: {block_number.get_number()}")
+    block = client.get_block_by_number(block_number.number)
     try:
         last_block = LastBlock.objects.get(id=1)
     except LastBlock.DoesNotExist:
-        last_block = LastBlock.objects.create(number=block_response.number, hash=block_response.hash)
+        last_block = LastBlock.objects.create(number=block.get_number(), hash=block.hash)
 
-    if last_block.number < block_response.get_number():
+    if last_block.number < block.get_number():
+        print("gogogo")
         next_number = last_block.number + 1
-        block_response = client.get_block_by_number(hex(next_number))
+        block = client.get_block_by_number(hex(next_number))
         try:
-            next_block = Blocks.objects.get(number=block_response.get_number())
+            next_block = Blocks.objects.get(number=block.get_number())
         except Blocks.DoesNotExist:
-            next_block = Blocks.create_with_block(block_response)
-        print(next_block)
+            print(block.get_difficulty())
+            print(block.get_total_difficulty())
+            next_block = Blocks.create_with_block(block)
+
+        process_block(next_block)
+
+
+        last_block.number = next_number
+        last_block.save()
 
 
 if __name__ == '__main__':
