@@ -22,7 +22,14 @@ class EthClient:
             raise RpcException
         return response
 
+    def get_transaction_by_hash(self, tx_hash):
+        response = self.requester.execute("eth_getTransactionByHash", tx_hash)
+        if response is None:
+            raise RpcException
+        return response
 
-
-
-
+    def get_transaction_receipt(self, tx_hash):
+        response = self.requester.execute("eth_getTransactionReceipt", tx_hash)
+        if response is None:
+            raise RpcException
+        return response

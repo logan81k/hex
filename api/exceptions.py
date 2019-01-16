@@ -12,9 +12,9 @@ class ServiceException(APIException):
         self.more_info = f"https://www.bitberry.app/docs/errors/{self.code}"
 
 
-class OnlyAvailableException(ServiceException):
-    def __init__(self):
-        super().__init__(1234, "허용되지 않는 값입니다.")
+class NotAllowedValueException(ServiceException):
+    def __init__(self, v):
+        super().__init__(1234, f"{v}는 허용되지 않는 값입니다.")
 
 
 

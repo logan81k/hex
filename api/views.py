@@ -8,7 +8,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from api import serializers
-from api.exceptions import OnlyAvailableException
+from api.exceptions import NotAllowedValueException
 
 logger = logging.getLogger(__name__)
 
@@ -43,7 +43,7 @@ class ExceptionView(GenericAPIView):
         pass
 
     def get(self, request, *args, **kwargs):
-        raise OnlyAvailableException
+        raise NotAllowedValueException
         # return Response(status=status.HTTP_200_OK, data="raise exceptions")
 
     def post(self, request, *args, **kwargs):

@@ -1,4 +1,4 @@
-from decimal import Decimal
+from web3 import Web3
 
 
 class BlockNumber:
@@ -6,7 +6,7 @@ class BlockNumber:
         self.number = number
 
     def get_number(self):
-        return int(self.number, 16)
+        return Web3.toInt(hexstr=self.number)
 
 
 class Block:
@@ -30,33 +30,30 @@ class Block:
         self.sha3_uncles = block["sha3Uncles"]
         self.state_root = block["stateRoot"]
         self.timestamp = block["timestamp"]
-        self.transactions = self._transactions(block["transactions"])
+        self.transactions = [Transaction(transaction) for transaction in block["transactions"]]
         self.transactions_root = block["transactionsRoot"]
         self.uncles = block["uncles"]
 
-    def _transactions(self, transactions):
-        return [Transaction(transaction) for transaction in transactions]
-
     def get_number(self):
-        return int(self.number, 16)
+        return Web3.toInt(hexstr=self.number)
 
     def get_gas_limit(self):
-        return int(self.gas_limit, 16)
+        return Web3.toInt(hexstr=self.gas_limit)
 
     def get_gas_used(self):
-        return int(self.gas_used, 16)
+        return Web3.toInt(hexstr=self.gas_used)
 
     def get_size(self):
-        return int(self.size, 16)
+        return Web3.toInt(hexstr=self.size)
 
     def get_difficulty(self):
-        return int(self.difficulty, 16)
+        return Web3.toInt(hexstr=self.difficulty)
 
     def get_total_difficulty(self):
-        return int(self.total_difficulty, 16)
+        return Web3.toInt(hexstr=self.total_difficulty)
 
     def get_timestamp(self):
-        ts = int(self.timestamp, 16)
+        ts = Web3.toInt(hexstr=self.timestamp)
         from django.utils.datetime_safe import datetime
         return datetime.utcfromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
 
@@ -84,13 +81,59 @@ class Transaction:
         self.v = transaction["v"]
         self.value = transaction["value"]
 
+    def get_block_number(self):
+        return Web3.toInt(hexstr=self.block_number)
+
     def get_gas(self):
-        return int(self.gas, 16)
+        return Web3.toInt(hexstr=self.gas)
 
     def get_gas_price(self):
-        return int(self.gas_price, 16)
+        return Web3.toInt(hexstr=self.gas_price)
 
     def get_nonce(self):
-        return int(self.nonce, 16)
+        return Web3.toInt(hexstr=self.nonce)
+
+    def get_transaction_index(self):
+        return Web3.toInt(hexstr=self.transaction_index)
+
+    def get_value(self):
+        return Web3.toInt(hexstr=self.value)
+
+    def get_ether_value(self):
+        return Web3.fromWei(Web3.toInt(hexstr=self.value), 'ether')
+
+    def get_nonce(self):
+        return Web3.toInt(hexstr=self.nonce)
 
 
+class Receipt:
+
+    def __init__(self, receipt) -> None:
+        self.block_hash = receipt['blockHash']
+        self.block_number = receipt['blockNumber']
+        self.contract_address = receipt['contractAddress']
+        self.cumulative_gas_used = receipt['cumulativeGasUsed']
+        self.from_address = receipt['from']
+        self.gas_used = receipt['gasUsed']
+        self.logs = receipt['logs']
+        self.logs_bloom = receipt['logsBloom']
+        self.root = receipt['root']
+        self.status = receipt['status']
+        self.to_address = receipt['to']
+        self.transaction_hash = receipt['transactionHash']
+        self.transaction_index = receipt['transactionIndex']
+
+    def get_block_number(self):
+        return int(self.block_number, 16)
+
+    def get_gas_used(self):
+        return int(self.gas_used, 16)
+
+    def get_cumulative_gas_used(self):
+        return int(self.cumulative_gas_used, 16)
+
+    def get_transaction_index(self):
+        return int(self.transaction_index, 16)
+
+    def get_status(self):
+        return int(self.status, 16)

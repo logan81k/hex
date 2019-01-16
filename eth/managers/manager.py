@@ -1,6 +1,7 @@
 from eth.managers.client import EthClient
 from eth.managers.requester import EthRequester
-from eth.managers.responses import BlockNumber, Block
+from eth.managers.responses import BlockNumber, Transaction, Receipt, Block
+
 
 class EthManager:
     def __init__(self) -> None:
@@ -13,3 +14,11 @@ class EthManager:
     def get_block_by_number(self, number: str):
         response = self.client.get_block_by_number(number)
         return Block(response)
+
+    def get_transaction_by_hash(self, tx_hash):
+        response = self.client.get_transaction_by_hash(tx_hash)
+        return Transaction(response)
+
+    def get_transaction_receipt(self, tx_hash):
+        response = self.client.get_transaction_receipt(tx_hash)
+        return Receipt(response)
