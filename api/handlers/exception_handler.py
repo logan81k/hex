@@ -23,14 +23,9 @@ def api_exception_handler(exc, context):
     print(f"response: {response}")
     if response is not None:
         if isinstance(exc, ServiceException):
-            # delete 
-            del response.data["detail"]
-
             response.data["code"] = exc.code
-            response.data["message"] = exc.message
+            response.data["detail"] = exc.detail
             response.data["more_info"] = exc.more_info
-
-            # serve status code in the response
         response.data['status'] = response.status_code
 
     return response
